@@ -8,29 +8,27 @@ distances = np.array([[0, 2, 1, 5, 7],
                       [2, 4, 0, 1, 3],
                       [5, 8, 1, 0, 2],
                       [7, 2, 3, 2, 0]])
+                      
+phermones =  np.ones(distances.shape)
 
 def find_start_ants(distances):
-    row_mean = np.divide(distances.sum(axis=1), distances.shape[0])
-    start_ants_coord = np.where(distances >= row_mean)
-    # listOfCoordinates= list(zip(start_ants_coord[0], start_ants_coord[1]))
-    # for cord in listOfCoordinates:
-    #     print(cord)
-    return start_ants_coord
-
-# def parse_ants(distances, start_ants):
-
-#     if (not start_ants):
-#         return 0
-#     else:
-#         start_ants.remove[0][0]
-#         start_ants.remove[1][0]
-#         return parse_ants
-
-def parse_ants(distances, start_ants):
-    print(start_ants[0][5])
+    row_sum = distances.sum(axis=1)
+    sum_mean = np.mean(row_sum)
+    start_ants = np.where(row_sum >= sum_mean)
+    
+    return start_ants
+  
+def ant_tour(distances):
+    path = []
+    row_mean = distances.mean(axis=1)
+    for i in range(distances.shape[0]):
+        for j in range(distances.shape[1]):
+            if(distances[i][j]>=row_mean[i]):
+                path.append([i,j])
 
 
-coords = find_start_ants(distances)
-parse_ants(distances, coords)
+
+start_ants = find_start_ants(distances)
+ant_tour(distances, start_ants)
 
 
