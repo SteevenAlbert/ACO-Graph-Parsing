@@ -25,10 +25,19 @@ def find_start_ants(distances):
 
 row_mean = distances.mean(axis=1)
 
+def spread_phermone(path):
+    for i in range(path):
+        phermones[path[i][0]][path[i][1]]*=1/distances[path[i][0]][path[i][1]]
+
 def all_paths(distances, start_ants):
-    for i in range(start_ants):
-        arr = []
-        path = ant_path(distances, start_ants[i], arr)
+    paths=[]
+    for i in range(len(start_ants)):
+        path = [[-1,-1]]
+        ant_path(distances, start_ants[i], path)
+        paths.append(path)
+    for j in range(paths):
+        spread_phermone(paths[j])
+
 
 
 def ant_path(distances, start_ant, path):
@@ -37,7 +46,7 @@ def ant_path(distances, start_ant, path):
         return
 
     mean = row_mean[start_ant]
-    row = distances[start_ant]
+    row = distances[start_ant]*phermones[start_ant]
     sorted = np.sort(distances[start_ant])[::-1]
 
     for i in range(len(sorted)):
@@ -46,6 +55,12 @@ def ant_path(distances, start_ant, path):
             ant_path(distances, np.where(row == sorted[i])[0][0], path)
             break
 
+
+def run(iterations):
+    for i in range(iterations):
+        ants=find_start_ants(distances)
+        all_paths(distances,ants)
+        phermones*=0.95
 # PROMISING/LEARNING RATE
 # promising(start_ant, np.where(row == sorted[i])[0][0], path)
 # def promising(start, end, path):
@@ -65,6 +80,7 @@ def ant_path(distances, start_ant, path):
 # start_ants = find_start_ants(distances)
 path = [[-1,-1]]
 ant_path(distances, 0, path)
-print(path)
+# print(path)
+# run(3) 
 
 
