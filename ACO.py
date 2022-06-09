@@ -1,5 +1,6 @@
 from tracemalloc import start
 import numpy as np
+import pandas as pd
 
 from AntColony import AntColony
 
@@ -9,11 +10,15 @@ distances = np.array([[0, 2, 1, 5, 7],
                       [5, 8, 1, 0, 2],
                       [7, 2, 3, 2, 0]])
 
-# np.array([[0, 0.8, 0.2, 0.1, 0.5],
+# distances = np.array([[0, 0.8, 0.2, 0.1, 0.5],
 #                       [0.2, 0, 0.3, 0.7, 0.2],
 #                       [0.5, 0.3, 0, 0.5, 0.4],
 #                       [0.6, 0.2, 0.6, 0, 0.3],
 #                       [0.5, 0.1, 0.4, 0.3, 0]])
+
+# distances = pd.read_csv("graphs\CryptoWall.csv_2_Win32_Filecoder.CryptoWall.G trojan.csv")
+
+
 phermones =  np.ones(distances.shape)
 
 def find_start_ants(distances):
