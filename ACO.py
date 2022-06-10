@@ -118,9 +118,9 @@ run(2, phermones)
 
 scaledPhermones = NormalizeData(phermones)
 df = pd.DataFrame(phermones)
-df.to_csv("Phermones.csv")
+df.to_csv("Phermones.csv", index=False, header=None)
 
 df = pd.DataFrame(scaledPhermones)
-df.to_csv("ScaledPhermones.csv")
+df.to_csv("ScaledPhermones.csv", index=False, header=None)
 # print ("--------------------------SCALED PHERMONES-----------------------")
 # print(scaledPhermones)
