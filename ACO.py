@@ -28,10 +28,9 @@ np.set_printoptions(suppress=True)
 #                       [0.5, 0.1, 0.4, 0.3, 0]])
 
 distances = pd.read_csv(
-    "graphs/CryptoWall.csv_2_Win32_Filecoder.CryptoWall.D trojan.csv")
-distances.drop(distances.columns[0], axis=1, inplace=True)
+    "graphs/CryptoWall.csv_2_Win32_Filecoder.CryptoWall.D trojan.csv", header=None)
 distances = np.array(distances.to_numpy())
-phermones = np.ones(distances.shape)
+phermones = np.zeros(distances.shape)
 
 
 #------------------------------------------------FUNCTIONS-----------------------------------------------
@@ -53,7 +52,7 @@ row_mean = distances.mean(axis=1)
 # Spread the phermones depending on the weight of the edge
 def spread_phermone(path):
     for i in range(len(path)):
-        phermones[path[i][0]][path[i][1]] *= distances[path[i][0]][path[i][1]]
+        phermones[path[i][0]][path[i][1]] += distances[path[i][0]][path[i][1]]
 
 
 # Check whether this edge should be visited
