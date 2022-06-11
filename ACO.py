@@ -1,20 +1,20 @@
-#---------------------------------------------------
-#   Created by:                            
-#   Laila Elhattab  
-#   Steven Albert  
-#   Rana Raafat          
-#   Judy Wagdy             
-#                       
-#   Supervised by:          
-#   Dr. Eslam Amer          
-#---------------------------------------------------
+# ---------------------------------------------------
+#   Created by:
+#   Laila Elhattab
+#   Steven Albert
+#   Rana Raafat
+#   Judy Wagdy
+#
+#   Supervised by:
+#   Dr. Eslam Amer
+# ---------------------------------------------------
 
 import numpy as np
 import pandas as pd
 np.set_printoptions(suppress=True)
 
 
-#----------------------------------------------INITIALIZATION------------------------------------------
+# ----------------------------------------------INITIALIZATION------------------------------------------
 # distances = np.array([[0, 2, 1, 5, 7],
 #                        [2, 0, 4, 8, 2],
 #                        [2, 4, 0, 1, 3],
@@ -33,8 +33,8 @@ distances = np.array(distances.to_numpy())
 phermones = np.zeros(distances.shape)
 
 
-#------------------------------------------------FUNCTIONS-----------------------------------------------
-# Finding the start ants 
+# ------------------------------------------------FUNCTIONS-----------------------------------------------
+# Finding the start ants
 def find_start_ants(distances):
     start_ants = []
     # Get the mean of each row
@@ -50,6 +50,8 @@ def find_start_ants(distances):
 row_mean = distances.mean(axis=1)
 
 # Spread the phermones depending on the weight of the edge
+
+
 def spread_phermone(path):
     for i in range(len(path)):
         phermones[path[i][0]][path[i][1]] += distances[path[i][0]][path[i][1]]
@@ -101,17 +103,36 @@ def ant_path(distances, start_ant, path):
                 row == sorted[i])[0][0]], path)
             break
 
-# The main function 
+# The main function
+
+
 def run(iterations, phermones):
     for i in range(iterations):
+        print("\n")
+        print("Iteration no. ", i+1)
+        print("------------------")
+        print("\n")
         ants = find_start_ants(distances)
-        all_paths(distances, ants)
-        phermones *= 0.95 # the decay factor 
+        paths = all_paths(distances, ants)
+        phermones *= 0.95  # the decay factor
+
+        # print ants tours and phermones
+        for k in range(len(ants)):
+            print("Start ant: ", ants[k])
+            print("Path: ", paths[k])
+            print("Phermone: ", end="")
+            for c in range(len(paths[k])):
+                print(round(phermones[paths[k][c][0]]
+                            [paths[k][c][1]], 4), end="")
+                print(" ", end="")
+            print("\n")
+
 
 def NormalizeData(data):
     return (data - np.min(data)) / (np.max(data) - np.min(data))
 
-#--------------------------------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------------------------------
 run(2, phermones)
 # print ("----------------------------PHERMONES--------------------------")
 # print(phermones)
