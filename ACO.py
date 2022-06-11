@@ -108,24 +108,10 @@ def ant_path(distances, start_ant, path):
 
 def run(iterations, phermones):
     for i in range(iterations):
-        print("\n")
-        print("Iteration no. ", i+1)
-        print("------------------")
-        print("\n")
         ants = find_start_ants(distances)
         paths = all_paths(distances, ants)
         phermones *= 0.95  # the decay factor
-
-        # print ants tours and phermones
-        for k in range(len(ants)):
-            print("Start ant: ", ants[k])
-            print("Path: ", paths[k])
-            print("Phermone: ", end="")
-            for c in range(len(paths[k])):
-                print(round(phermones[paths[k][c][0]]
-                            [paths[k][c][1]], 4), end="")
-                print(" ", end="")
-            print("\n")
+    return ants, paths
 
 
 def NormalizeData(data):
@@ -133,7 +119,17 @@ def NormalizeData(data):
 
 
 # --------------------------------------------------------------------------------------------------------
-run(2, phermones)
+ants, paths = run(2, phermones)
+
+# print ants tours and phermones
+for k in range(len(ants)):
+    print("Start ant: ", ants[k])
+    print("Path: ", paths[k])
+    print("Phermone: ", end="")
+    for c in range(len(paths[k])):
+        print(round(phermones[paths[k][c][0]][paths[k][c][1]], 4), end="")
+        print(" ", end="")
+    print("\n")
 # print ("----------------------------PHERMONES--------------------------")
 # print(phermones)
 
