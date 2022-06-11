@@ -55,8 +55,10 @@ row_mean = distances.mean(axis=1)
 def spread_phermone(path):
     for i in range(len(path)):
         phermones[path[i][0]][path[i][1]] += distances[path[i][0]][path[i][1]]
+        file.write(str(round(phermones[path[i][0]][path[i][1]],4))+ " ")
+    file.write("\n \n")
 
-
+        
 # Check whether this edge should be visited
 def promising(start, end, path):
     sum = 0
@@ -83,7 +85,10 @@ def all_paths(distances, start_ants):
         ant_path(distances, start_ants[i], path)
         paths.append(path)
     for j in range(len(paths)):
+        file.write("Path "+str(paths[j])+"\n")
+        file.write("Phermones ")
         spread_phermone(paths[j])
+        
     return paths
 
 
@@ -108,9 +113,11 @@ def ant_path(distances, start_ant, path):
 
 def run(iterations, phermones):
     for i in range(iterations):
+        file.write("-----------------------------Iteration "+ str(i)+ ":-----------------------------\n")
         ants = find_start_ants(distances)
         paths = all_paths(distances, ants)
         phermones *= 0.95  # the decay factor
+        file.write("After applying the decay factor: \n"+repr(phermones)+"\n")
     return ants, paths
 
 
@@ -119,17 +126,18 @@ def NormalizeData(data):
 
 
 # --------------------------------------------------------------------------------------------------------
+file = open("steps.txt","w")
 ants, paths = run(2, phermones)
 
 # print ants tours and phermones
-for k in range(len(ants)):
-    print("Start ant: ", ants[k])
-    print("Path: ", paths[k])
-    print("Phermone: ", end="")
-    for c in range(len(paths[k])):
-        print(round(phermones[paths[k][c][0]][paths[k][c][1]], 4), end="")
-        print(" ", end="")
-    print("\n")
+# for k in range(len(ants)):
+#     print("Start ant: ", ants[k])
+#     print("Path: ", paths[k])
+#     print("Phermone: ", end="")
+#     for c in range(len(paths[k])):
+#         print(round(phermones[paths[k][c][0]][paths[k][c][1]], 4), end="")
+#         print(" ", end="")
+#     print("\n")
 # print ("----------------------------PHERMONES--------------------------")
 # print(phermones)
 
