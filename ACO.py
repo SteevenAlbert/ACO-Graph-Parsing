@@ -31,6 +31,7 @@ distances = pd.read_csv(
     "graphs/CryptoWall.csv_2_Win32_Filecoder.CryptoWall.D trojan.csv", header=None)
 distances = np.array(distances.to_numpy())
 phermones = np.zeros(distances.shape)
+participation = np.zeros(distances.shape)
 
 
 # ------------------------------------------------FUNCTIONS-----------------------------------------------
@@ -50,29 +51,36 @@ def find_start_ants(distances):
 row_mean = distances.mean(axis=1)
 
 # Spread the phermones depending on the weight of the edge
-
-
 def spread_phermone(path):
-    for i in range(len(path)):
-        phermones[path[i][0]][path[i][1]] += distances[path[i][0]][path[i][1]]
+    lr = calculateLR(path)
+    for i in range(len(path)):       
+        phermones[path[i][0]][path[i][1]] += participation[path[i][0]][path[i][1]] / lr
         file.write(str(round(phermones[path[i][0]][path[i][1]],4))+ " ")
     file.write("\n \n")
 
-        
-# Check whether this edge should be visited
-def promising(start, end, path):
-    sum = 0
 
-    # Check whether the learning rate will increase with the addition of this edge
+def calculateLR(path):
+    sum = 0
     for i in range(len(path)):
         sum += distances[path[i][0]][path[i][1]]
     lr = sum/len(path)
+    return lr 
 
-    new_sum = sum + distances[start][end]
-    new_lr = new_sum/(len(path)+1)
+
+# Check whether this edge should be visited
+def promising(start, end, path):
+    lr = calculateLR(path)
+
+    new_path = path.copy()
+    new_path.append([start, end])
+    new_lr = calculateLR(new_path)
 
     # Check whether the end node has already been visited
-    if not any(end in sublist for sublist in path) and new_lr >= lr:
+    if not any(end in sublist for sublist in path) and new_lr >= lr:  
+        if new_lr == lr:
+            participation[start][end] = participation[path[-1][0]][path[-1][1]]
+        else:
+            participation[start][end] = new_lr - lr
         return True
     return False
 
@@ -84,11 +92,9 @@ def all_paths(distances, start_ants):
         path = []
         ant_path(distances, start_ants[i], path)
         paths.append(path)
-    for j in range(len(paths)):
-        file.write("Path "+str(paths[j])+"\n")
+        spread_phermone(path)
+        file.write("Path "+str(path)+"\n")
         file.write("Phermones ")
-        spread_phermone(paths[j])
-        
     return paths
 
 
@@ -97,55 +103,30 @@ def ant_path(distances, start_ant, path):
     if len(path) == distances.shape[0]:
         return
 
-    row = distances[start_ant[1]]*phermones[start_ant[1]]
+    row = distances[start_ant[1]] *phermones[start_ant[1]]
     sorted = np.sort(row)[::-1]
 
     path.append(start_ant)
+    participation[start_ant[0]][start_ant[1]] = distances[start_ant[0]][start_ant[1]]
     for i in range(len(sorted)):
-        if promising(start_ant[1], np.where(row == sorted[i])[0][0], path):
-
+        if promising(start_ant[1], np.where(row == sorted[i])[0][0], path):            
             ant_path(distances, [start_ant[1], np.where(
                 row == sorted[i])[0][0]], path)
             break
 
 # The main function
-
-
-def run(iterations, phermones):
-    for i in range(iterations):
+def run(phermones):
+    ants = find_start_ants(distances)
+    for i in range(len(ants)):
         file.write("-----------------------------Iteration "+ str(i)+ ":-----------------------------\n")
-        ants = find_start_ants(distances)
         paths = all_paths(distances, ants)
         phermones *= 0.95  # the decay factor
         file.write("After applying the decay factor: \n"+repr(phermones)+"\n")
     return ants, paths
 
-
-def NormalizeData(data):
-    return (data - np.min(data)) / (np.max(data) - np.min(data))
-
-
 # --------------------------------------------------------------------------------------------------------
 file = open("steps.txt","w")
-ants, paths = run(2, phermones)
+ants, paths = run(phermones)
 
-# print ants tours and phermones
-# for k in range(len(ants)):
-#     print("Start ant: ", ants[k])
-#     print("Path: ", paths[k])
-#     print("Phermone: ", end="")
-#     for c in range(len(paths[k])):
-#         print(round(phermones[paths[k][c][0]][paths[k][c][1]], 4), end="")
-#         print(" ", end="")
-#     print("\n")
-# print ("----------------------------PHERMONES--------------------------")
-# print(phermones)
-
-scaledPhermones = NormalizeData(phermones)
 df = pd.DataFrame(phermones)
 df.to_csv("Phermones.csv", index=False, header=None)
-
-df = pd.DataFrame(scaledPhermones)
-df.to_csv("ScaledPhermones.csv", index=False, header=None)
-# print ("--------------------------SCALED PHERMONES-----------------------")
-# print(scaledPhermones)
