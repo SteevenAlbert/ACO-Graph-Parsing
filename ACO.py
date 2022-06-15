@@ -27,8 +27,8 @@ np.set_printoptions(suppress=True)
 #                       [0.6, 0.2, 0.6, 0, 0.3],
 #                       [0.5, 0.1, 0.4, 0.3, 0]])
 
-distances = pd.read_csv(
-    "graphs/CryptoWall.csv_2_Win32_Filecoder.CryptoWall.D trojan.csv", header=None)
+graph_name = "CryptoWall.csv_2_Win32_Filecoder.CryptoWall.D trojan.csv"
+distances = pd.read_csv("graphs/"+graph_name, header=None)
 distances = np.array(distances.to_numpy())
 phermones = np.zeros(distances.shape)
 participation = np.zeros(distances.shape)
@@ -45,6 +45,7 @@ def find_start_ants(distances):
             # Append the edges where the weight is at least equal to the row mean
             if distances[i][j] >= row_mean[i]:
                 start_ants.append([i, j])
+                participation[i][j] = distances[i][j]
     return start_ants
 
 
@@ -92,9 +93,9 @@ def all_paths(distances, start_ants):
         path = []
         ant_path(distances, start_ants[i], path)
         paths.append(path)
-        spread_phermone(path)
         file.write("Path "+str(path)+"\n")
         file.write("Phermones ")
+        spread_phermone(path)
     return paths
 
 
@@ -103,22 +104,25 @@ def ant_path(distances, start_ant, path):
     if len(path) == distances.shape[0]:
         return
 
-    row = distances[start_ant[1]] *phermones[start_ant[1]]
-    sorted = np.sort(row)[::-1]
+
+    row = distances[start_ant[1]] * phermones[start_ant[1]]
+
+    sorted_row = sorted(enumerate(row), key=lambda x: x[1], reverse=True)
 
     path.append(start_ant)
-    participation[start_ant[0]][start_ant[1]] = distances[start_ant[0]][start_ant[1]]
-    for i in range(len(sorted)):
-        if promising(start_ant[1], np.where(row == sorted[i])[0][0], path):            
-            ant_path(distances, [start_ant[1], np.where(
-                row == sorted[i])[0][0]], path)
+
+    for i in [sub[0] for sub in sorted_row ]:
+        if promising(start_ant[1], i, path):  
+            ant_path(distances, [start_ant[1], i], path)
             break
+
 
 # The main function
 def run(phermones):
     ants = find_start_ants(distances)
+
     for i in range(len(ants)):
-        file.write("-----------------------------Iteration "+ str(i)+ ":-----------------------------\n")
+        file.write("\n-----------------------------Iteration "+ str(i)+ ":-----------------------------\n")
         paths = all_paths(distances, ants)
         phermones *= 0.95  # the decay factor
         file.write("After applying the decay factor: \n"+repr(phermones)+"\n")
@@ -129,4 +133,6 @@ file = open("steps.txt","w")
 ants, paths = run(phermones)
 
 df = pd.DataFrame(phermones)
-df.to_csv("Phermones.csv", index=False, header=None)
+df.to_csv("phermones/Phermones___"+graph_name+".csv", index=False, header=None)
+
+# print(phermones)
